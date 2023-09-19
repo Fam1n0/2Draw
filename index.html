@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: white;
+  }
+  #drawingCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="drawingCanvas" width="800" height="600"></canvas>
+
+<script>
+  const canvas = document.getElementById('drawingCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let t = 0;
+  let offsetX = canvas.width / 2;
+  let offsetY = canvas.height / 2;
+  let scale = 20;
+  let velocity = 0.05;
+  let lineWidth = 2;
+
+  let noise = new SimplexNoise();
+  
+  ctx.strokeStyle = 'rgb(0, 0, 0)';
+  ctx.lineWidth = lineWidth;
+  ctx.beginPath();
+
+  function draw() {
+    t += velocity;
+
+    let x = scale * Math.cos(t);
+    let y = scale * Math.sin(2 * t);
+
+    // Using Perlin noise to create a natural, flowing trajectory
+    offsetX += noise.noise2D(t, 0) * 2;
+    offsetY += noise.noise2D(0, t) * 2;
+
+    // Keeping the line within the canvas bounds
+    if (offsetX < 0 || offsetX > canvas.width || offsetY < 0 || offsetY > canvas.height) {
+      offsetX = Math.random() * canvas.width;
+      offsetY = Math.random() * canvas.height;
+      ctx.moveTo(offsetX, offsetY);
+    }
+
+    ctx.lineTo(offsetX + x, offsetY + y);
+    ctx.stroke();
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+</script>
+</body>
+</html>
